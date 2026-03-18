@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TERMINAL DEL REACTOR - 3º ESO</title>
+    <style>
+        body { background-color: #1a0f00; color: #ff9900; font-family: 'Consolas', monospace; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        #terminal { background: #2b1a00; border: 3px solid #ff9900; border-radius: 5px; padding: 30px; width: 85%; max-width: 700px; box-shadow: 0 0 20px #ff9900; }
+        input { background: #000; border: 1px solid #ff9900; color: #ff9900; padding: 12px; width: 90%; font-size: 1.1em; margin: 10px 0; outline: none; }
+        button { background: #ff9900; color: #000; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; width: 100%; text-transform: uppercase; }
+        button:hover { background: #ffcc00; }
+        .progress-bar { width: 100%; background: #442200; height: 15px; border-radius: 2px; margin-bottom: 20px; border: 1px solid #ff9900; }
+        #fill { background: #ff9900; height: 100%; width: 0%; transition: 0.4s; }
+        .warning { color: #ff0000; font-weight: bold; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <h1 class="warning">⚠️ ADVERTENCIA: NÚCLEO INESTABLE ⚠️</h1>
+    <div style="margin-bottom: 10px;">PROGRESO DEL ESCANEADO: <span id="current-step">1</span>/31</div>
+    <div class="progress-bar"><div id="fill"></div></div>
+
+    <div id="terminal">
+        <div id="game-content">
+            <p id="question-text">Iniciando protocolo de seguridad...</p>
+            <input type="text" id="answer-input" placeholder="Escriba respuesta técnica..." autocomplete="off">
+            <button onclick="processStep()" id="btn-action">SIGUIENTE FASE</button>
+        </div>
+
+        <div id="final-screen" style="display:none; text-align: center;">
+            <h2 id="final-title">RESULTADO DEL PROTOCOLO</h2>
+            <p id="final-msg"></p>
+            <button onclick="location.reload()" style="background:#ff3300; color:white;">REINICIAR SISTEMA</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "¿Paso de gas a sólido sin pasar por líquido?", a: "sublimacion inversa" },
+            { q: "¿Unidad S.I. para la masa?", a: "kilogramo" },
+            { q: "Partícula del átomo con carga negativa.", a: "electron" },
+            { q: "Número de protones + neutrones si Z=6 y N=6.", a: "12" },
+            { q: "¿Filas horizontales de la tabla periódica?", a: "periodos" },
+            { q: "Mezcla donde no se distinguen componentes.", a: "homogenea" },
+            { q: "Símbolo químico del Hierro.", a: "fe" },
+            { q: "Aceleración de un objeto a velocidad constante.", a: "0" },
+            { q: "¿Ley de conservación de la masa?", a: "lavoisier" },
+            { q: "¿Electrones de la última capa?", a: "valencia" },
+            { q: "Enlace donde se comparten electrones.", a: "covalente" },
+            { q: "¿Qué tipo de magnitud es la fuerza?", a: "vectorial" },
+            { q: "Fórmula del agua oxigenada.", a: "h2o2" },
+            { q: "Unidad de fuerza en el S.I.", a: "newton" },
+            { q: "¿Cambio de posición respecto a un punto?", a: "movimiento" },
+            { q: "¿Elemento con número atómico 1?", a: "hidrogeno" },
+            { q: "Ion con carga positiva.", a: "cation" },
+            { q: "Estado con partículas muy desordenadas.", a: "gaseoso" },
+            { q: "Método de separación por puntos de ebullición.", a: "destilacion" },
+            { q: "Enlace entre metal y no metal.", a: "ionico" },
+            { q: "Letra que representa el número másico.", a: "a" },
+            { q: "Familia del Helio, Neón y Argón.", a: "gases nobles" },
+            { q: "Espacio recorrido dividido por tiempo.", a: "velocidad" },
+            { q: "Fuerza que atrae cuerpos a la Tierra.", a: "gravedad" },
+            { q: "Símbolo químico del Potasio.", a: "k" },
+            { q: "Densidad de 10g en 5cm3 (número).", a: "2" },
+            { q: "Sustancias iniciales en una reacción.", a: "reactivos" },
+            { q: "Unidad de energía en el S.I.", a: "julio" },
+            { q: "Autor del modelo de 'pastas en un pastel'.", a: "thomson" },
+            { q: "Movimiento en línea recta.", a: "rectilineo" }
+        ];
+
+        let currentIndex = 0;
+        let errors = 0;
+        const MASTER_CODE = "REACTOR-2026-SAFE";
+
+        function processStep() {
+            const inputField = document.getElementById('answer-input');
+            const val = inputField.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+            if (currentIndex < questions.length) {
+                // Validación silenciosa
+                const correct = questions[currentIndex].a.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if (val !== correct) {
+                    errors++;
+                }
+                currentIndex++;
+                showNext();
+            } else {
+                // Verificación del código final
+                if (val === MASTER_CODE.toLowerCase() && errors === 0) {
+                    showFinal(true);
+                } else {
+                    showFinal(false);
+                }
+            }
+        }
+
+        function showNext() {
+            const inputField = document.getElementById('answer-input');
+            inputField.value = "";
+            
+            if (currentIndex < questions.length) {
+                document.getElementById('question-text').innerText = questions[currentIndex].q;
+                document.getElementById('current-step').innerText = currentIndex + 1;
+                document.getElementById('fill').style.width = `${(currentIndex/31)*100}%`;
+            } else {
+                document.getElementById('question-text').innerText = "FINAL: Introduzca CÓDIGO DE DESACTIVACIÓN DEL NÚCLEO:";
+                document.getElementById('current-step').innerText = "31";
+                document.getElementById('fill').style.width = "98%";
+                document.getElementById('btn-action').innerText = "DETENER REACTOR";
+            }
+        }
+
+        function showFinal(success) {
+            document.getElementById('game-content').style.display = "none";
+            document.getElementById('final-screen').style.display = "block";
+            const msg = document.getElementById('final-msg');
+            
+            if (success) {
+                document.getElementById('final-title').innerText = "✅ ESTABILIZADO";
+                msg.innerHTML = "Protocolo correcto. El núcleo se ha enfriado. Has salvado el laboratorio.";
+            } else {
+                document.getElementById('final-title').innerText = "💥 FALLO CRÍTICO";
+                msg.innerHTML = "Código erróneo o parámetros de entrada corruptos. El núcleo ha colapsado. Debes repetir el proceso con datos exactos.";
+            }
+        }
+
+        showNext();
+    </script>
+</body>
+</html>
