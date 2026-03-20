@@ -78,7 +78,7 @@
             const val = inputField.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 
             if (currentIndex < questions.length) {
-                // Validación silenciosa
+                // Validación silenciosa: guarda el error pero permite avanzar
                 const correct = questions[currentIndex].a.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 if (val !== correct) {
                     errors++;
@@ -86,7 +86,7 @@
                 currentIndex++;
                 showNext();
             } else {
-                // Verificación del código final
+                // Validación del CÓDIGO FINAL (Pregunta 31)
                 if (val === MASTER_CODE.toLowerCase() && errors === 0) {
                     showFinal(true);
                 } else {
@@ -94,8 +94,8 @@
                 }
             }
         }
-
-        function showNext() {
+        
+function showNext() {
             const inputField = document.getElementById('answer-input');
             inputField.value = "";
             
@@ -104,10 +104,16 @@
                 document.getElementById('current-step').innerText = currentIndex + 1;
                 document.getElementById('fill').style.width = `${(currentIndex/31)*100}%`;
             } else {
-                document.getElementById('question-text').innerText = "FINAL: Introduzca CÓDIGO DE DESACTIVACIÓN DEL NÚCLEO:";
+                // MOMENTO CLAVE:
+                if (errors === 0) {
+                    document.getElementById('question-text').innerHTML = "DATOS VALIDADOS. EL CÓDIGO DE SALIDA ES: <br><br><span style='color:white; font-size:1.5em;'>" + MASTER_CODE + "</span><br><br>Introdúzcalo para abrir:";
+                } else {
+                    document.getElementById('question-text').innerHTML = "<span style='color:red;'>ERROR: DATOS CORRUPTOS.</span><br>No se pudo generar el código de salida. Revise sus respuestas desde el inicio.";
+                }
+                
                 document.getElementById('current-step').innerText = "31";
-                document.getElementById('fill').style.width = "98%";
-                document.getElementById('btn-action').innerText = "DETENER REACTOR";
+                document.getElementById('fill').style.width = "100%";
+                document.getElementById('btn-action').innerText = "ABRIR COMPUERTA";
             }
         }
 
