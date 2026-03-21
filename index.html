@@ -78,7 +78,6 @@
             const val = inputField.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 
             if (currentIndex < questions.length) {
-                // Validación silenciosa: guarda el error pero permite avanzar
                 const correct = questions[currentIndex].a.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 if (val !== correct) {
                     errors++;
@@ -86,7 +85,7 @@
                 currentIndex++;
                 showNext();
             } else {
-                // Validación del CÓDIGO FINAL (Pregunta 31)
+                // Validación final del código manual
                 if (val === MASTER_CODE.toLowerCase() && errors === 0) {
                     showFinal(true);
                 } else {
@@ -94,8 +93,8 @@
                 }
             }
         }
-        
-function showNext() {
+
+        function showNext() {
             const inputField = document.getElementById('answer-input');
             inputField.value = "";
             
@@ -104,16 +103,15 @@ function showNext() {
                 document.getElementById('current-step').innerText = currentIndex + 1;
                 document.getElementById('fill').style.width = `${(currentIndex/31)*100}%`;
             } else {
-                // MOMENTO CLAVE:
+                // Pantalla final antes del código
                 if (errors === 0) {
-                    document.getElementById('question-text').innerHTML = "DATOS VALIDADOS. EL CÓDIGO DE SALIDA ES: <br><br><span style='color:white; font-size:1.5em;'>" + MASTER_CODE + "</span><br><br>Introdúzcalo para abrir:";
+                    document.getElementById('question-text').innerHTML = "DATOS VALIDADOS. EL CÓDIGO DE DESACTIVACIÓN ES: <br><br><span style='color:white; font-size:1.5em;'>" + MASTER_CODE + "</span><br><br>Introdúzcalo para detener el reactor:";
                 } else {
-                    document.getElementById('question-text').innerHTML = "<span style='color:red;'>ERROR: DATOS CORRUPTOS.</span><br>No se pudo generar el código de salida. Revise sus respuestas desde el inicio.";
+                    document.getElementById('question-text').innerHTML = "<span style='color:#ff0000;'>ERROR: DATOS CORRUPTOS.</span><br>El sistema detectó errores en la secuencia técnica. No se puede generar el código.";
                 }
-                
                 document.getElementById('current-step').innerText = "31";
                 document.getElementById('fill').style.width = "100%";
-                document.getElementById('btn-action').innerText = "ABRIR COMPUERTA";
+                document.getElementById('btn-action').innerText = "DETENER REACTOR";
             }
         }
 
@@ -123,11 +121,11 @@ function showNext() {
             const msg = document.getElementById('final-msg');
             
             if (success) {
-                document.getElementById('final-title').innerText = "✅ ESTABILIZADO";
-                msg.innerHTML = "Protocolo correcto. El núcleo se ha enfriado. Has salvado el laboratorio.";
+                document.getElementById('final-title').innerText = "✅ NÚCLEO ESTABILIZADO";
+                msg.innerHTML = "Felicidades. Has salvado el laboratorio con éxito.";
             } else {
-                document.getElementById('final-title').innerText = "💥 FALLO CRÍTICO";
-                msg.innerHTML = "Código erróneo o parámetros de entrada corruptos. El núcleo ha colapsado. Debes repetir el proceso con datos exactos.";
+                document.getElementById('final-title').innerText = "💥 COLAPSO DEL NÚCLEO";
+                msg.innerHTML = "El código es erróneo o hubo fallos previos en la entrada de datos.";
             }
         }
 
